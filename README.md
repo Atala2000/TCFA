@@ -12,7 +12,7 @@ python manage.py runserver 80000
 
 ## Usage
 You can use the following endpoints to interact with the API service:
-* JWT Token is needed for access to endpoints, to get one go to /user/auth/login in browser and enter your credentials
+* JWT Token is needed for access to endpoints, to get one go to `http://localhost:8000/user/auth/login` in browser and enter your credentials
 * For subsequent requests pass the token in the Authorization header as follows: `
 * `Authorization : Bearer <token here>`
 
