@@ -7,6 +7,7 @@ class CustomerSerializer(serializers.ModelSerializer):
         fields = ['code', 'name', 'phone']
 
 class OrderSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Order
-        fields = ['id', 'customer', 'item', 'amount', 'time']
+        fields = ['order_code', 'customer', 'item', 'amount', 'time']
