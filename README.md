@@ -13,7 +13,36 @@ python manage.py runserver 80000
 ## Usage
 You can use the following endpoints to interact with the API service:
 * JWT Token is needed for access to endpoints, to get one go to `http://localhost:8000/user/auth/login` in browser and enter your credentials
-* For subsequent requests pass the token in the Authorization header as follows: `
+* The response will be a json object with the token inside
+  ```json
+  {
+  "message": "Authentication successful",
+  "token": {
+    "access_token": "<value>",
+    "id_token": "<value>",
+    "scope": "openid profile email",
+    "expires_in": 86400,
+    "token_type": "Bearer",
+    "expires_at": 1721825073,
+    "userinfo": {
+      "given_name": "John",
+      "family_name": "Doe",
+      "nickname": "John",
+      "name": "John Doe",
+      "picture": "https://lh3.googleusercontent.com/<value>",
+      "updated_at": "2024-07-23T08:05:32.520Z",
+      "email": "johndoe@gmail.com",
+      "email_verified": true,
+      "iss": "xxx",
+      "aud": "5xmDDP713kDbXQLAJmYHbrsEUycwkTSh",
+      "iat": 1721738673,
+      "exp": 1721774673,
+      "sub": "xxx",xxx",
+      "nonce": "xxx"
+    }
+  }
+  ```
+* For subsequent requests pass the `id_token` in the Authorization header as follows: `
 * `Authorization : Bearer <token here>`
 
 ## Order Endpoints
