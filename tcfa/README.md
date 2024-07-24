@@ -37,7 +37,7 @@ You can use the following endpoints to interact with the API service:
       "aud": "5xmDDP713kDbXQLAJmYHbrsEUycwkTSh",
       "iat": 1721738673,
       "exp": 1721774673,
-      "sub": "xxx",xxx",
+      "sub": "xxx",
       "nonce": "xxx"
     }
   }
@@ -106,3 +106,7 @@ You can use the following endpoints to interact with the API service:
         "phone": "+00000",
     }
     ```
+
+### Africa Talks
+* Once an order is posted a message is sent to the Africa Talks API
+* 
