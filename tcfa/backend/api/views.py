@@ -24,10 +24,16 @@ class OrderListCreate(generics.ListCreateAPIView):
     search_fields = ['order_code']
 
     def perform_create(self, serializer):
+        """
+        Send an SMS notification to the customer after creating an order
+        """
         order = serializer.save()
         self.send_sms_notification(order)
 
     def send_sms_notification(self, order):
+        """
+        Send an SMS notification to the customer
+        """
         customer = order.customer
         order_details = {
             "sms_message": f"Hi {customer.name}, your order ({order.order_code}) for {order.item} has been successfully recieved. Thank you for choosing us!",
@@ -49,6 +55,9 @@ class OrderRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
         self.send_sms_notification(order)
 
     def send_sms_notification(self, order):
+        """
+        Send an SMS notification to the customer after updating an order
+        """
         customer = order.customer
         order_details = {
             "sms_message": f"Hi {customer.name}, your order ({order.order_code}) for {order.item} has been successfully updated. Thank you for choosing us!",
@@ -61,6 +70,9 @@ class OrderRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
             print(f"{e}")
 
     def perform_destroy(self, instance):
+        """
+        Send an SMS notification to the customer after deleting an order
+        """
         customer = instance.customer
         order_details = {
             "sms_message": f"Hi {customer.name}, your order ({instance.order_code}) for {instance.item} has been successfully deleted. Thank you for choosing us!",
