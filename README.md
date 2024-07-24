@@ -4,7 +4,7 @@ This is a simple Django API service that allows you to create, read, update and 
 ## Installation
 ```bash
 git clone https://github.com/Atala2000/TCFA.git
-cd TCFA
+cd TCFA/tcfa
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver 80000
@@ -13,7 +13,7 @@ python manage.py runserver 80000
 ## Docker Installation
 ```bash
 git clone
-cd TCFA
+cd TCFA/tcfa
 docker-compose down -v
 docker-compose build
 docker-compose up
