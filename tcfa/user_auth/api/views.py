@@ -45,11 +45,14 @@ class Auth0TokenAuthentication(authentication.BaseAuthentication):
             raise exceptions.AuthenticationFailed("Error decoding token")
 
     def get_or_create_user(self, payload):
+        """
+        Get or create a user based on the payload from the JWT token.
+        """
         user_id = payload.get("sub")
         if not user_id:
             raise exceptions.AuthenticationFailed("Invalid payload")
 
-        user, created = User.objects.get_or_create(username=user_id)
+        user, _ = User.objects.get_or_create(username=user_id)
         return user
 
     def authenticate_header(self, request):
@@ -62,6 +65,9 @@ def auth0_login(request):
 
 
 def auth0_callback(request):
+    """
+    Callback endpoint after authentication with Auth0.
+    """
     try:
         token = oauth.auth0.authorize_access_token(request)
         id_token = token.get("id_token", None)
@@ -80,12 +86,11 @@ def auth0_callback(request):
 
 
 def logout(request):
+    """
+    Log out the user by clearing the session.
+    """
     request.session.flush()  
     return_to = request.build_absolute_uri("/")
     return redirect(
         f"https://{settings.SOCIAL_AUTH_AUTH0_DOMAIN}/v2/logout?client_id={settings.SOCIAL_AUTH_AUTH0_KEY}&returnTo={quote_plus(return_to)}"
     )
-
-def get_user(request):
-    user = request.session.get("user", None)
-    return JsonResponse({"user": user})
