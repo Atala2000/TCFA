@@ -1,6 +1,8 @@
 # Django Order API Service
 This is a simple Django API service that allows you to create, read, update and delete orders. It is a simple REST API service that uses Django Rest Framework.
 
+ * If working with docker set DB_HOST=db in the .env file, if not set DB_HOST=localhost
+
 ## Installation
 ```bash
 git clone https://github.com/Atala2000/TCFA.git
