@@ -10,6 +10,45 @@ python manage.py migrate
 python manage.py runserver 80000
 ```
 
+## Docker Installation
+```bash
+git clone
+cd TCFA
+docker-compose down -v
+docker-compose build
+docker-compose up
+```
+
+## Testing
+```bash
+python manage.py test
+```
+## Environment Variables
+* Create a `.env` file in the root directory and add the following variables:
+  ```bash
+  DATABASE_URL=postgresql://atala:StrongPass123!@postgresserver/tcfa
+
+  # AfricaTalks
+  USERNAME=<username>
+  API_KEY=<api_key>
+
+  # Auth0
+  AUTH0_CLIENT_ID=<client_id>
+  AUTH0_CLIENT_SECRET=<client_secret>
+  AUTH0_DOMAIN=<domain>
+  AUTH0_REDIRECT_URI=<redirect_uri>
+  ISSUER=<issuer>
+  API_AUDIENCE=<audience>
+
+  # Database
+  DB_NAME=<database_name>
+  DB_USER=<database_user>
+  DB_PASSWORD=<database_password>
+  DB_HOST=db
+  DB_PORT=5432
+  ```
+
+
 ## Usage
 You can use the following endpoints to interact with the API service:
 * JWT Token is needed for access to endpoints, to get one go to `http://localhost:8000/user/auth/login` in browser and enter your credentials
@@ -109,4 +148,4 @@ You can use the following endpoints to interact with the API service:
 
 ### Africa Talks
 * Once an order is posted a message is sent to the Africa Talks API
-* 
+* Ensure you have a sandboox in Africa Talks and inout the customer's phone number in the emulator to receive the message
