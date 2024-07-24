@@ -1,6 +1,7 @@
 import os
 import jwt
 from urllib.parse import quote_plus, urlencode
+import requests
 from rest_framework import authentication, exceptions
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -24,13 +25,24 @@ class Auth0TokenAuthentication(authentication.BaseAuthentication):
 
         try:
             token = auth_header.split(" ")[1]
-            payload = jwt.decode(token, options={"verify_signature": False})
+            payload = self.decode_jwt(token)
             user = self.get_or_create_user(payload)
+            request.session['user_id'] = user.id  # Store user ID in the session
             return (user, token)
         except jwt.ExpiredSignatureError:
             raise exceptions.AuthenticationFailed("Token has expired")
         except jwt.InvalidTokenError:
             raise exceptions.AuthenticationFailed("Invalid token")
+
+    def decode_jwt(self, token):
+        """
+        Decode JWT token without verifying the signature.
+        This should be replaced with a more secure verification method in production.
+        """
+        try:
+            return jwt.decode(token, options={"verify_signature": False})
+        except jwt.DecodeError:
+            raise exceptions.AuthenticationFailed("Error decoding token")
 
     def get_or_create_user(self, payload):
         user_id = payload.get("sub")
@@ -42,7 +54,7 @@ class Auth0TokenAuthentication(authentication.BaseAuthentication):
 
     def authenticate_header(self, request):
         return "Bearer"
-
+    
 
 def auth0_login(request):
     redirect_uri = request.build_absolute_uri("/user/auth/callback")
@@ -54,11 +66,11 @@ def auth0_callback(request):
         token = oauth.auth0.authorize_access_token(request)
         id_token = token.get("id_token", None)
 
-        if id_token is None:
-            raise ValueError("No id_token found in the request")
-
         if id_token:
             decoded_token = jwt.decode(id_token, options={"verify_signature": False})
+            user_id = decoded_token.get("sub")
+            user = User.objects.get_or_create(username=user_id)[0]
+            request.session['user_id'] = user.id 
 
         return JsonResponse(
             {"message": "Authentication successful","token": token}
@@ -68,10 +80,10 @@ def auth0_callback(request):
 
 
 def logout(request):
-    request.session.clear()
+    request.session.flush()  
     return_to = request.build_absolute_uri("/")
     return redirect(
-        f"https://{settings.SOCIAL_AUTH_AUTH0_DOMAIN}/v2/logout?client_id={settings.SOCIAL_AUTH_AUTH0_KEY}&returnTo={return_to}"
+        f"https://{settings.SOCIAL_AUTH_AUTH0_DOMAIN}/v2/logout?client_id={settings.SOCIAL_AUTH_AUTH0_KEY}&returnTo={quote_plus(return_to)}"
     )
 
 def get_user(request):
