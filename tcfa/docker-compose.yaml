@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres
+    container_name: db_c
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - ./db:/var/lib/postgresql/data
+
+  tcfa:
+    build: .
+    container_name: tcfa_c
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - db
