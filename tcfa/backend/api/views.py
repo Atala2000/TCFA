@@ -1,20 +1,27 @@
-from rest_framework import generics
+from rest_framework import generics, filters
 from rest_framework.permissions import IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
 from ..models import Customer, Order
 from .serializers import CustomerSerializer, OrderSerializer
 from ..utils.africa_talks import send_sms
+from .filters import OrderFilter
 
 
 class CustomerListCreate(generics.ListCreateAPIView):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['code']
 
 
 class OrderListCreate(generics.ListCreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend,filters.SearchFilter]
+    filterset_class = OrderFilter
+    search_fields = ['order_code']
 
     def perform_create(self, serializer):
         order = serializer.save()
@@ -23,7 +30,7 @@ class OrderListCreate(generics.ListCreateAPIView):
     def send_sms_notification(self, order):
         customer = order.customer
         order_details = {
-            "sms_message": f"Order ({order.order_code}) for {customer.name}, your order for {order.item} has been received.",
+            "sms_message": f"Hi {customer.name}, your order ({order.order_code}) for {order.item} has been successfully recieved. Thank you for choosing us!",
             "phone_no": f"{customer.phone}",
         }
         try:
@@ -44,7 +51,7 @@ class OrderRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     def send_sms_notification(self, order):
         customer = order.customer
         order_details = {
-            "sms_message": f"Order ({order.order_code}) for {customer.name}, your order for {order.item} has been updated.",
+            "sms_message": f"Hi {customer.name}, your order ({order.order_code}) for {order.item} has been successfully updated. Thank you for choosing us!",
             "phone_no": f"{customer.phone}",
         }
         try:
@@ -56,7 +63,7 @@ class OrderRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     def perform_destroy(self, instance):
         customer = instance.customer
         order_details = {
-            "sms_message": f"Order ({instance.id}) for {customer.name}, your order for {instance.item} has been deleted.",
+            "sms_message": f"Hi {customer.name}, your order ({instance.order_code}) for {instance.item} has been successfully deleted. Thank you for choosing us!",
             "phone_no": f"{customer.phone}",
         }
         try:
