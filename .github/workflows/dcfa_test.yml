@@ -1,0 +1,59 @@
+name: TCFA Django Test
+
+on:
+    pull_request:
+        branches:
+            - main
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+
+        services:
+            postgres:
+                image: postgres:13
+                env:
+                    POSTGRES_USER: postgres
+                    POSTGRES_PASSWORD: postgres
+                    POSTGRES_DB: postgres
+                ports:
+                    - 5432:5432
+                options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+        steps:
+        - name: Checkout code
+          uses: actions/checkout@v2
+
+        - name: Set up Python
+          uses: actions/setup-python@v2
+          with:
+            python-version: 3.10
+
+        - name: Install dependencies
+          run: |
+            python -m venv venv
+            source venv/bin/activate
+            pip install -r requirements.txt
+            pip install pytest pytest-django pytest-cov
+
+        - name: Wait for Postgres to be ready
+          run: |
+            until pg_isready -h localhost -p 5432 -U postgres; do
+              sleep 1
+            done
+
+        - name: Apply migrations
+          run: |
+            source venv/bin/activate
+            python manage.py migrate
+
+        - name: Run tests with coverage
+          run: |
+            source venv/bin/activate
+            pytest --cov=backend --cov-report=term-missing
+
+        - name: Upload coverage report
+          uses: actions/upload-artifact@v2
+          with:
+            name: coverage-report
+            path: coverage/
